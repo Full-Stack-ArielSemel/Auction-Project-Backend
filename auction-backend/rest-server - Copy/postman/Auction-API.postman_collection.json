@@ -1,0 +1,703 @@
+{
+  "info": {
+    "_postman_id": "b12ef585-4d08-4d42-98cf-auction-backend",
+    "name": "Auction Backend API Tests",
+    "description": "Postman collection for the Auction Project Spring Boot backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "fullName",
+      "value": "Postman Test User"
+    },
+    {
+      "key": "email",
+      "value": "postman@example.com"
+    },
+    {
+      "key": "username",
+      "value": "postman_user"
+    },
+    {
+      "key": "password",
+      "value": "Test1234!"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": "1"
+    },
+    {
+      "key": "bidOffer",
+      "value": "150"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "adminUserId",
+      "value": ""
+    },
+    {
+      "key": "targetUserId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication & Stats",
+      "item": [
+        {
+          "name": "Sign Up - Valid",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sign-up?fullName={{fullName}}&email={{email}}&username={{username}}&password={{password}}&repeatPassword={{password}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sign-up"
+              ],
+              "query": [
+                {
+                  "key": "fullName",
+                  "value": "{{fullName}}"
+                },
+                {
+                  "key": "email",
+                  "value": "{{email}}"
+                },
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}"
+                },
+                {
+                  "key": "repeatPassword",
+                  "value": "{{password}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Sign up succeeds\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Valid",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/login?username={{username}}&password={{password}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Login succeeds\", function () {",
+                  "    pm.expect(body.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test(\"Token is returned\", function () {",
+                  "    pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"User ID is returned\", function () {",
+                  "    pm.expect(body.userId).to.exist;",
+                  "});",
+                  "",
+                  "if (body.token) {",
+                  "    pm.collectionVariables.set(\"token\", body.token);",
+                  "}",
+                  "",
+                  "if (body.userId !== undefined && body.userId !== null) {",
+                  "    pm.collectionVariables.set(\"userId\", String(body.userId));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Invalid Credentials",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/login?username={{username}}&password=WrongPassword123!",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "password",
+                  "value": "WrongPassword123!"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Login is rejected\", function () {",
+                  "    pm.expect(body.success).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Error code is returned\", function () {",
+                  "    pm.expect(body.errorCode).to.not.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-user-stats?token={{token}}&userId={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-user-stats"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Global Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-stats"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auction Features",
+      "item": [
+        {
+          "name": "Get My Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-my-products?token={{token}}&userId={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-my-products"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Bids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-my-bids?token={{token}}&userId={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-my-bids"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Products For Sale",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-products-for-sale?token={{token}}&userId={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-products-for-sale"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-product-details?token={{token}}&userId={{userId}}&productId={{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-product-details"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "productId",
+                  "value": "{{productId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add New Product - Valid",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/add-new-product?token={{token}}&userId={{userId}}&name=Postman Test Product&description=Created from Postman&logoUrl=https://example.com/product.png&startingPrice=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "add-new-product"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "name",
+                  "value": "Postman Test Product"
+                },
+                {
+                  "key": "description",
+                  "value": "Created from Postman"
+                },
+                {
+                  "key": "logoUrl",
+                  "value": "https://example.com/product.png"
+                },
+                {
+                  "key": "startingPrice",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Place Bid - Valid",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/place-bid?token={{token}}&userId={{userId}}&productId={{productId}}&offer={{bidOffer}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "place-bid"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "productId",
+                  "value": "{{productId}}"
+                },
+                {
+                  "key": "offer",
+                  "value": "{{bidOffer}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Bid succeeds\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Place Bid - Missing Product Id",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/place-bid?token={{token}}&userId={{userId}}&offer={{bidOffer}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "place-bid"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "offer",
+                  "value": "{{bidOffer}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Request is rejected\", function () {",
+                  "    pm.expect(body.success).to.eql(false);",
+                  "});",
+                  "",
+                  "pm.test(\"Error code is returned\", function () {",
+                  "    pm.expect(body.errorCode).to.not.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Close Auction",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/close-auction?token={{token}}&userId={{userId}}&productId={{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "close-auction"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                },
+                {
+                  "key": "productId",
+                  "value": "{{productId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Management",
+      "item": [
+        {
+          "name": "Get Manage Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-manage-details?token={{adminToken}}&userId={{adminUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-manage-details"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{adminUserId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Details - Admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/get-user-details?token={{adminToken}}&userId={{targetUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "get-user-details"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{targetUserId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Credit - Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/add-credit?token={{adminToken}}&userId={{targetUserId}}&creditToAdd=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "add-credit"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{targetUserId}}"
+                },
+                {
+                  "key": "creditToAdd",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Credit - Unauthorized",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/add-credit?token={{token}}&userId={{targetUserId}}&creditToAdd=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "add-credit"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{token}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{targetUserId}}"
+                },
+                {
+                  "key": "creditToAdd",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "pm.test(\"Unauthorized request is rejected\", function () {",
+                  "    pm.expect(body.success).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
