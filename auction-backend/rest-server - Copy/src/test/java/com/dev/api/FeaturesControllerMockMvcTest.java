@@ -70,7 +70,6 @@ class FeaturesControllerMockMvcTest {
          * also has its own Persist field.
          *
          * basicValidation() and userHasPermissions()
-         * use this field.
          */
         ReflectionTestUtils.setField(
                 controller,
